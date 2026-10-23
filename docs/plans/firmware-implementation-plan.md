@@ -1,8 +1,10 @@
 # Firmware implementation action plan
 
-**Overall status:** implementation started; baseline verified, shared contract in progress.  
-**Current tasks:** T03–T05 core lane and T06–T07 hardware lane, opening after the T02 checkpoint.  
-**Latest update:** T01 baseline passed; T02 common channel contract and validation assertions passed. Preparing isolated core and hardware worktrees.
+**Overall status:** software delivery complete (T01–T08); prototype validation awaits physical hardware (T09).
+
+**Current task:** T09, awaiting physical prototype measurements. No software implementation tasks remain.
+
+**Latest update:** G3 passed all three native executables, the Nano Every target build, and focused integrated code review. Documentation is updated; no flash/upload or physical measurements were performed.
 
 ## Sources and scope
 
@@ -11,7 +13,7 @@
 - [Electronics specification](../specs/electronical-specs.md) and [mechanical specification](../specs/mechanical-specs.md): hardware constraints.
 - [Repository instructions](../../AGENTS.md): English code/documentation, GitNexus checks, and change discipline.
 
-Current baseline: `src/main.cpp` is the two-channel diagnostic sketch. Production lighting logic and a host test executable are not yet present. Preserve the existing `nano_every` target and 115200 baud monitor configuration. This plan is an execution tracker, not a replacement for the specifications.
+Starting baseline (before T01): `src/main.cpp` was the two-channel diagnostic sketch; production lighting logic and host tests were absent. Those artifacts are now implemented and tracked below. Preserve the existing `nano_every` target and 115200 baud monitor configuration. This plan is an execution tracker, not a replacement for the specifications.
 
 ## Tracking rules
 
@@ -29,13 +31,13 @@ Current baseline: `src/main.cpp` is the two-channel diagnostic sketch. Productio
 |---|---|---|---|---|
 | T01 | Confirm implementation baseline and tools | — | DONE | clean starting tree at 5ff04d6; g++ available; baseline Nano Every build passed (3707 B flash, 177 B RAM); index source unchanged, metadata one commit behind |
 | T02 | Implement channel model and validated effect assignment | T01 | DONE | g++ C++11 with -Wall -Wextra -Werror -pedantic; channel, brightness, invalid assignment assertions passed |
-| T03 | Implement steady, linear breathing, and flash evaluation | T02 | TODO | exact boundaries, concurrency, independent updates, and rollover assertions pass |
-| T04 | Implement Sleep, Awake, and Chaos scenes | T03 | TODO | all six outputs, paired timing, initial delays, and effect restarts checked |
-| T05 | Implement autonomous scheduler and bounded random selections | T04 | TODO | duration limits, 90/10 selection partition, transitions, and rollover checked |
-| T06 | Prepare Nano Every outputs, startup, and cooperative loop | T02 contract; final integration after T05 | TODO | adapter checks pass locally; complete target build checked after integration |
-| T07 | Add bounded serial diagnostics | T06 on hardware lane | TODO | English events and partial/nonblocking transmission checked; final target build after integration |
-| T08 | Integrate lanes, verify software, and update operator docs | T05 and T07 | TODO | complete host suite and target build pass; README and agent guidance match production firmware |
-| T09 | Validate the assembled prototype | T08 | TODO | physical output, timing, optical, power, and thermal results recorded, or explicitly awaiting hardware |
+| T03 | Implement steady, linear breathing, and flash evaluation | T02 | DONE | integrated core 2522be8 (lane 64875a2); native core and integrated assertions passed |
+| T04 | Implement Sleep, Awake, and Chaos scenes | T03 | DONE | integrated core 2522be8; paired delays, scene restart and full output checks passed |
+| T05 | Implement autonomous scheduler and bounded random selections | T04 | DONE | integrated core 2522be8; full deterministic 90/10 partition, ranges, deadlines and rollover passed |
+| T06 | Prepare Nano Every outputs, startup, and cooperative loop | T02 contract; final integration after T05 | DONE | integrated hardware 4dffae6 (lane 4042b48); adapter + real-core integration checks and target build passed |
+| T07 | Add bounded serial diagnostics | T06 on hardware lane | DONE | integrated hardware 4dffae6; partial/zero TX, English logs, lengths and autonomous progress assertions passed |
+| T08 | Integrate lanes, verify software, and update operator docs | T05 and T07 | DONE | G3: native suites and board build pass; integrated read-only review found no concrete bugs; English README and agent guidance updated |
+| T09 | Validate the assembled prototype | T08 | AWAITING HARDWARE | physical output, timing, optical, power, and thermal results recorded, or explicitly awaiting hardware |
 
 ## Parallel execution with Git worktrees
 
@@ -80,9 +82,9 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 
 | Lane | Actual branch / worktree path | Base / task commits | Owner | State |
 |---|---|---|---|---|
-| Integration | not assigned | T02 checkpoint not created | coordinator | not started |
-| Core | not created | awaiting T02 checkpoint | unassigned | not started |
-| Hardware | not created | awaiting T02 checkpoint | unassigned | not started |
+| Integration | `firmware/implementation`, project root | shared 05fdfe6; core 2522be8; hardware 4dffae6 | coordinator | G3 software verified; T09 pending |
+| Core | `firmware/core`; worktree `/tmp/pumpkin-demon-core` removed after verification | base 05fdfe6; core 64875a2 → integrated 2522be8 | core agent | verified and integrated |
+| Hardware | `firmware/hardware`; worktree `/tmp/pumpkin-demon-hardware` removed after verification | base 05fdfe6; hardware 4042b48 → integrated 4dffae6 | hardware agent | verified and integrated |
 
 ## Task details
 
@@ -157,16 +159,24 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 | Check | Latest result | Evidence / next action |
 |---|---|---|
 | Existing diagnostic baseline build | PASS | `pio run -e nano_every`: Atmel megaAVR 1.10.0, Arduino core 1.8.8, AVR GCC 7.3.0; flash 3707 B, RAM 177 B |
-| Production host assertions | NOT IMPLEMENTED | add incrementally in T02–T05 and adapter checks in T06–T07 |
-| Production Nano Every build | NOT RUN | first integration build in T06; final build in T08 |
-| Functional acceptance coverage | PENDING | reconcile software and hardware scenarios in T08 |
+| Production host assertions | PASS | `bash scripts/test-firmware.sh`: core, isolated adapter, and actual-core integrated adapter pass with C++11 warnings as errors; lane ASan/UBSan pass with unsupported LeakSanitizer disabled |
+| Production Nano Every build | PASS | `pio run -e nano_every`: flash 7566 B (15.6%), static RAM 524 B (8.5%), Arduino core 1.8.8 / AVR GCC 7.3.0 |
+| Functional acceptance coverage | SOFTWARE PASS / HARDWARE PENDING | effect, scene, scheduler, startup/GPIO, serial and integrated transition assertions pass; physical output and timing remain T09 |
 | ≤5 ms physical timing target | NOT MEASURED | T09, with instrumentation and logging active |
 | Optical/current/thermal/power-bank checks | NOT PERFORMED | T09 on assembled prototype |
+| Integrated code review | PASS | read-only review: no concrete functional, AVR arithmetic, timer-phase, output-adapter, or serial-backpressure bugs found |
+| Graph analysis before lane commits | PASS | worktree-specific fresh indexes; core 19 changed symbols / 2 expected flows; hardware 80 symbols / 4 expected flows; both medium risk, no partial/truncated result |
 
 ## Progress log
 
 | Event | Result | Next action |
 |---|---|---|
+| T04 / scheduler checks passed locally | scenes, random bound/order checks, 90/10 partition, durations, repeated Chaos, overdue entry and rollover pass; final core checks in progress | finish core verification |
+| T03 branch-local checks passed | breathing sample values, regular/delayed flashes, rollover, concurrency, and independent updates pass | T04 scenes and T05 scheduler |
+| Worktree cleanup | both worktrees clean; owned paths matched integrated tree exactly; removed worktrees normally and retained task branches | hardware checklist remains T09 |
+| G3 software delivery verified | all native tests and board build passed; review found no concrete bugs; docs aligned; bounded-log drop policy documented | T09 physical validation |
+| G1/G2 integration passed | lane core 64875a2 integrated as 2522be8; hardware 4042b48 integrated as 4dffae6; no conflicts; native suites and board build pass | T08 review/docs, T09 physical checks |
+| G0 / lanes opened | checkpoint 05fdfe6; core and hardware agents assigned isolated worktrees and disjoint files | core T03–T05 and hardware T06–T07 |
 | T02 contract validated | shared lighting.h declarations, setEffect validation, and native assertions passed; GitNexus index refreshed with runner 1.6.12 | commit checkpoint and open worktrees |
 | Implementation started | clean tree at 5ff04d6; native compiler and baseline build verified | prepare T02 shared contract |
 | Plan created | specifications and confirmed decisions decomposed into T01–T09; no production work started | begin T01 when implementation is requested |
@@ -175,3 +185,22 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 ## Completion rule
 
 Software delivery is complete when T01–T08 are `DONE` with passing recorded checks and accurate documentation. Overall validation is complete only when T09 is also `DONE`. If hardware checks remain pending, report that explicitly and keep their status visible in this plan.
+
+## Hardware handoff checklist
+
+T09 is awaiting hardware, not complete. The production image is built locally but has not been uploaded.
+
+- Upload deliberately to the six-channel assembly using the README instructions; monitor at 115200 baud.
+- Check reset/startup, all six outputs, pair synchronization, white/yellow separation, and PWM/digital transitions. Observe Sleep for its selected 3–10 minute interval; use the logged duration to know when the next episode is due.
+- Capture output edges and mode deadlines with suitable instrumentation. Record maximum measured lateness and output-evaluation interval against the ≤5 ms target, with diagnostics active.
+- Confirm smooth breathing, white brightness, and operation without a serial monitor.
+- Measure total current, voltage under load, ULN2003A temperature, and power-bank low-load retention using the electrical specification's 30-minute tests.
+- Record board/wiring revision, measurement conditions, results, and any adjustments before changing T09 to DONE.
+
+## Execution notes
+
+- T03–T05 were delivered as one core lane commit and T06–T07 as one hardware lane commit because the paired tasks share files; their checks were performed incrementally before integration.
+- The supplied plan is a live action tracker, not a generated GitNexus provenance-pack plan. It was intentionally updated throughout execution as requested.
+- Initial sandboxed analyzer/Git subprocesses required elevated execution for local cache/index operations. Index refreshes and worktree-specific graph gates subsequently succeeded. Canonical MCP staleness metadata lagged the CLI refresh during startup; current source and fresh worktree indexes were used for the actual commit gates.
+- ASan/UBSan passed in both lanes. LeakSanitizer was disabled because the traced execution environment does not support it; production code uses no dynamic allocation.
+- Serial diagnostics retain one pending event and may drop later events if TX stays blocked; this limit is documented in code, README, and technical specifications.

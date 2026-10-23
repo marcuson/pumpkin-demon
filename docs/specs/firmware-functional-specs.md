@@ -154,4 +154,4 @@ All review questions are resolved. The incomplete ember request was discarded an
 
 ## 9. Implementation boundary
 
-This document specifies the target production behavior. It does not change or describe as complete the current two-channel diagnostic firmware. Implementation, pin/timer choices, final tuning, and hardware validation remain separate work. No persistent settings, runtime configuration protocol, audio, sensors, or individual LED addressing is required by this draft.
+This document specifies production behavior. Software delivery and physical validation are tracked separately in the [implementation plan](../plans/firmware-implementation-plan.md); completed software checks do not establish hardware validation. The original two-channel diagnostic sequence is outside the production scenes. No persistent settings, runtime configuration protocol, audio, sensors, or individual LED addressing is required by this draft.

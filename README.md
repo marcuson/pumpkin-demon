@@ -1,48 +1,69 @@
-# Pumpkin Demon — firmware di prova
+# Pumpkin Demon
 
-Progetto PlatformIO per Arduino Nano Every. Il firmware prova due gruppi LED
-indipendenti tramite i primi due canali dell'ULN2003A.
+Autonomous lighting firmware for an Arduino Nano Every inside a real carved pumpkin. The production design controls six electrical groups through an ULN2003A: two eyes, two mouth corners, yellow embers, and white flashes. Each group contains three LEDs; the yellow and white groups share a physical board but remain separate circuits.
 
-## Collegamenti sulla breadboard
+## Hardware
 
-| Nano Every | ULN2003A DIP-16 |
-| --- | --- |
-| D3 | pin 1 (IN1) |
-| D5 | pin 2 (IN2) |
-| GND | pin 8 (GND) |
+| Nano Every | ULN2003A channel | LED group |
+|---|---|---|
+| D3 | 1 | Left eye, red |
+| D5 | 2 | Right eye, red |
+| D6 | 3 | Left mouth corner, red |
+| D9 | 4 | Right mouth corner, red |
+| D10 | 5 | Embers, yellow |
+| D11 | 6 | Flashes, white |
 
-- Pin 16 (OUT1) → catodi dei LED del gruppo 1.
-- Pin 15 (OUT2) → catodi dei LED del gruppo 2.
-- Pin 9 (COM) → non collegato.
-- Per **ogni** LED: `5V → resistenza da 220 Ω → anodo LED → catodo LED → uscita ULN2003A`.
-- Per questa prova con pochi LED, porta il 5V della scheda al rail positivo
-  della breadboard e GND al rail negativo. Alimenta il Nano dalla presa USB.
+The first five channels use hardware PWM for intermediate brightness. D11 is digital only: off, fully on, or flashes. Every LED needs its own resistor. A0 is reserved as an unconnected input for startup random-seed sampling.
 
-Con la tacca del chip verso l'alto, i pin 1 e 2 sono i primi due a sinistra;
-i pin 16 e 15 sono i primi due a destra.
+Follow the [electronics specification](docs/specs/electronical-specs.md) for the complete power distribution, connector mapping, component limits, and assembly checks. Power the Nano through Micro-USB; branch the LED supply before the board and share ground with the ULN2003A. Leave ULN2003A COM unconnected for these LED loads. Follow the [mechanical specification](docs/specs/mechanical-specs.md) for support, insulation, and protection against pumpkin liquids.
 
-## Prova
+## Autonomous behavior
 
-Apri questa cartella come progetto PlatformIO e usa **Build** e **Upload** con
-il Nano Every collegato via USB. Da terminale, se `pio` è disponibile:
+| Mode | Eyes and mouth | Yellow embers | White LEDs |
+|---|---|---|---|
+| Sleep | Steady at 20% | Linear breathing, 10–60%, 4-second cycle | Off |
+| Awake | Fully on | Fully on | 100 ms on / 400 ms off |
+| Chaos | Flashes | Flashes | Flashes |
+
+The firmware starts in Sleep. Each Sleep interval lasts a random **3–10 minutes**. The next episode is Awake with 90% probability, lasting **5–10 seconds**, or Chaos with 10% probability, lasting **2–5 seconds**. Either episode returns immediately to a newly timed Sleep interval. Repeated Chaos selections are allowed, with Sleep between episodes.
+
+In Chaos, flashes are **100 ms on / 200 ms off**. Eyes flash as a synchronized pair, as do mouth corners. Eyes, mouth, embers, and whites each receive an independent random initial delay of **0–1500 ms**, selected once on mode entry. Outputs remain off during that delay. Delays are included in the episode duration; coincident delays are allowed.
+
+Effects restart on every mode entry, with no transition fade. No computer, sensor, or operator input is required. Sleep is a lighting scene rather than microcontroller power-saving sleep. Random choices are decorative pseudo-randomness; a unique sequence after every reset is not guaranteed.
+
+## Build, upload, and serial monitor
+
+Open this folder in PlatformIO, select the `nano_every` environment, and use Build. From a terminal with PlatformIO on the path:
 
 ```sh
-pio run
-pio run -t upload
+pio run -e nano_every
 ```
 
-Il ciclo dura 5 secondi: gruppo 1 acceso, gruppo 2 acceso, entrambi a metà
-luminosità, entrambi al massimo, entrambi spenti. Ogni fase dura 1 secondo.
+To install the firmware on the connected Nano Every, close any serial monitor first, disconnect the power bank, and connect the PC to the Nano's Micro-USB socket:
 
-## Log seriali
+```sh
+pio run -e nano_every -t upload
+pio device monitor -b 115200
+```
 
-Dopo aver caricato il firmware aggiornato, apri il **Serial Monitor** di
-PlatformIO (115200 baud), oppure esegui `pio device monitor`.
-Il firmware stampa un messaggio di avvio e una riga per ogni fase con i valori
-PWM comandati su D3 e D5 (0 = spento, 255 = massimo).
-Se apri il monitor dopo l'avvio, vedrai comunque le fasi ripetersi; premi RESET
-con il monitor aperto per rileggere anche i messaggi iniziali.
+Serial diagnostics are in English and report startup and mode changes, including the selected duration and Chaos delays. They do not report every brightness update. Opening a monitor after startup still shows subsequent transitions; reset the board with the monitor open to inspect startup. The lighting sequence runs without the monitor connected. Diagnostics retain one pending event; if transmission remains stalled across mode changes, later events can be dropped rather than blocking the lights or corrupting a partial line.
 
-I log confermano l'esecuzione del firmware e i comandi inviati, non la corrente
-nei LED. Se le fasi scorrono ma i LED restano spenti, occorre verificare
-alimentazione, massa comune, orientamento dei LED e collegamenti dell'ULN2003A.
+Logs describe commanded behavior, not measured current or confirmed illumination. Check the selected episode and its duration before interpreting long periods in Sleep as a fault.
+
+## Software checks and prototype validation
+
+The native assertion checks exercise production lighting logic with controlled time and random choices, plus the board adapter using a small Arduino stub. Run all three native test executables (core, isolated adapter, and integrated adapter with the real core) with a C++11 compiler installed:
+
+```sh
+bash scripts/test-firmware.sh
+```
+
+Set `CXX` to a different compiler executable if needed. See the [implementation plan](docs/plans/firmware-implementation-plan.md) for recorded results.
+
+A successful build and passing host checks do not validate physical wiring, LED brightness, power-bank behavior, temperature, or the **5 ms timing target**. These require measurements on the assembled prototype. In particular, test white brightness with the actual LEDs and ULN2003A voltage drop, verify reset and all six outputs, and perform the current/voltage/thermal and low-load tests described in the electronics specification. Hardware validation status is tracked separately in the plan.
+
+## Specifications
+
+- [Firmware functional specification](docs/specs/firmware-functional-specs.md)
+- [Firmware technical specification](docs/specs/firmware-technical-specs.md)
+- [Firmware implementation action plan](docs/plans/firmware-implementation-plan.md)

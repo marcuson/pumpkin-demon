@@ -10,7 +10,7 @@
 - [Electronics specification](electronical-specs.md): pin assignments, ULN2003A, power distribution, and electrical validation.
 - [Mechanical specification](mechanical-specs.md): 18 LEDs, six electrical groups, and five perfboard assemblies.
 
-Implement the autonomous lighting firmware described by these documents. The existing `src/main.cpp` is a two-channel blocking diagnostic sketch, not the production implementation. Its one-second sequence and Italian log messages shall not be carried into the production behavior.
+Implement the autonomous lighting firmware described by these documents. The implementation started from a two-channel blocking diagnostic sketch in `src/main.cpp`. Its one-second sequence and Italian log messages are superseded by the autonomous production behavior; see the [implementation plan](../plans/firmware-implementation-plan.md) for current delivery and validation status.
 
 Keep the existing PlatformIO board/framework configuration. No additional runtime dependency, RTOS, custom interrupt handler, software PWM, timer-register configuration, persistent settings, or serial command protocol is required. Use the Arduino core's existing timing and PWM facilities.
 
@@ -155,7 +155,7 @@ Startup order:
 
 Log only startup, scene changes, and invalid internal effect assignments. Use elapsed milliseconds from the board clock, English mode names, and selected scene duration. A compact line may be `t=123456 mode=Awake duration_ms=7500`. For Chaos, also record the four selected initial delays so timing can be inspected. Millisecond timestamps wrap with the underlying clock; no persistent wall clock is required.
 
-Keep message formatting and storage bounded. Use fixed buffers or flash string literals instead of dynamic strings. Retain a bounded pending event and drain it in chunks no larger than `Serial.availableForWrite()` allows; render outputs before draining logs. Do not call `Serial.flush()` or wait for transmit space. Startup and its initial Sleep scene may be reported in one combined event. With scenes separated by seconds, a general-purpose log queue is unnecessary. A disconnected PC must not block the light sequence.
+Keep message formatting and storage bounded. Use fixed buffers or flash string literals instead of dynamic strings. Retain a bounded pending event and drain it in chunks no larger than `Serial.availableForWrite()` allows; render outputs before draining logs. Do not call `Serial.flush()` or wait for transmit space. Startup and its initial Sleep scene may be reported in one combined event. With scenes separated by seconds, a general-purpose log queue is unnecessary. Retain an already pending event until transmitted; if TX remains stalled across subsequent events, discard those new events rather than corrupting a partial line or blocking lighting. This bounded policy does not guarantee lossless diagnostic history. A disconnected PC must not block the light sequence.
 
 Use fixed arrays and compile-time constants for pins and scene parameters. Do not modify core timer prescalers or claim hardware sleep/power savings. Inspect flash/RAM usage in the target build; leave room for stack and serial buffers, and avoid runtime heap allocation.
 
@@ -185,7 +185,7 @@ Build the board target with `pio run -e nano_every`. Compile and run the host as
 
 When implementing, keep this document and the functional specification consistent with any agreed design change. Add operator instructions for the production behavior to the README and update `AGENTS.md` references if needed. Do not leave the diagnostic sketch described as the production firmware, or imply hardware validation was completed merely because the build passed.
 
-Completion requires production code, host checks, a successful Nano Every build, and separately recorded prototype results or an explicit statement that those hardware checks remain pending. No firmware source files are changed by creating this technical specification.
+Completion requires production code, host checks, a successful Nano Every build, and separately recorded prototype results or an explicit statement that those hardware checks remain pending. Track implemented software and pending physical checks in the [implementation plan](../plans/firmware-implementation-plan.md).
 
 ## 11. Technical basis
 

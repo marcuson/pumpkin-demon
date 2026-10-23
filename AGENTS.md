@@ -9,7 +9,7 @@
 
 - This is a PlatformIO / Arduino Nano Every (ATmega4809) project for reusable lighting inside a real carved pumpkin. The first version covers automatic lighting only; audio and external sensors are deferred.
 - Read [electronics specifications](docs/specs/electronical-specs.md) and [mechanical specifications](docs/specs/mechanical-specs.md) before changing related behavior, wiring, or assembly instructions. These documents contain the detailed design; keep affected documentation consistent with implementation changes.
-- Distinguish the current two-channel diagnostic firmware in `src/main.cpp` from the planned six-channel design. Do not expand the diagnostic firmware into the full effects system unless requested.
+- The production firmware implements the six-channel autonomous scenes in the [functional specification](docs/specs/firmware-functional-specs.md) and follows the [technical specification](docs/specs/firmware-technical-specs.md). Keep diagnostic experiments separate from the autonomous production behavior.
 
 ## Hardware constraints
 
@@ -25,6 +25,7 @@
 
 - Follow the [firmware implementation action plan](docs/plans/firmware-implementation-plan.md). Update task status, verification evidence, blockers, and next actions during implementation and before handing work back to the user.
 - Keep software completion separate from physical prototype validation; never mark unperformed hardware checks as passed.
+- Use separate worktrees for independent core and hardware work after the shared contract checkpoint. Follow the plan's file ownership and integration gates; the coordinator maintains the central tracker.
 
 ## Validation
 
