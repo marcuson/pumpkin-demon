@@ -26,7 +26,7 @@ Mechanical requirements:
                (lit eyes and mouth)
                          │
                   adjustable arms
-                and 3/5 mm LED holders
+                and LED perfboard modules
                          │
                   TELESCOPIC MAST
                  (attached wiring)
@@ -126,28 +126,36 @@ Available adjustments:
 
 Do not attach the arms to the pumpkin flesh: **the mast must fully support them**.
 
-## 6. LED holders and mounting assemblies
+## 6. LED perfboard modules
 
 ### Selected solution
 
-- **Plastic panel-mount LED holders**, preferably snap-in, for **3 mm** LEDs; some **5 mm** holders where useful.
-- LED holders mounted on **small rigid plastic tabs**, rather than directly on metal wire.
-- Each tab attaches to the end of an arm; a **small M3 screw with a self-locking nut** can provide tilt adjustment.
-- Each tab can accommodate **one or more LED holders**. In modules with multiple LEDs, each LED will have its own resistor; values and circuitry will be defined during electronics design.
-- Drill the tabs **only after receiving and measuring the LED holders**: the mounting hole may be larger than the LED's nominal 3/5 mm diameter.
+- Solder the LEDs and their individual current-limiting resistors directly onto **perfboard modules**.
+- Use **five perfboard assemblies for six independent electrical groups**: one board for each eye and mouth corner, plus one shared lower board for the yellow and white LEDs. Attach the boards to the mast/arms with insulating supports and, where useful, a small M3 screw with a self-locking nut for tilt adjustment. Keep mounting holes clear of copper pads and wiring.
+- Support the shared lower board just above the pumpkin floor, with all six LEDs pointing upward. Do not let the board or its wiring rest on the pumpkin flesh or in liquid.
+- Insulate the solder side and exposed leads; keep boards and connections away from pumpkin flesh and liquids. Provide strain relief at each module; LED leads and solder joints must not support the board.
+- Available LED colors are **red, yellow, blue, green, and white**. The initial build uses red, yellow, and white only.
 
-### Preliminary distribution
+### Selected distribution
 
-| Area | Proposed LEDs/holders | Adjustment |
-|---|---|---|
-| Left eye | 2–3 red 3 mm LEDs | upper collar, left arm |
-| Right eye | 2–3 red 3 mm LEDs | upper collar, right arm |
-| Left mouth | 2–3 orange 3 mm LEDs | middle collar |
-| Right mouth | 2–3 orange 3 mm LEDs | middle collar |
-| Internal embers | about 2 amber/yellow LEDs, 3 or 5 mm | lower level |
-| Demonic flashes | about 2 red LEDs, 3 or 5 mm | lower level |
+All distances below are **approximate, center-to-center targets**; use the nearest practical positions on the existing perfboard grid. There are **18 LEDs total: 12 red 3 mm, 3 yellow 5 mm, and 3 white 5 mm**, with one resistor per LED.
 
-**Count, exact colors, and positions are not yet final**: they depend on the carving and lighting results. Ideally, the LEDs should illuminate the openings without being directly visible; consider small diffusers if necessary.
+| Area | LEDs per electrical group | Layout | Adjustment |
+|---|---|---|---|
+| Left eye | 3 red 3 mm LEDs | approximately equilateral triangle, about 1 cm sides | upper collar, left arm |
+| Right eye | 3 red 3 mm LEDs | approximately equilateral triangle, about 1 cm sides | upper collar, right arm |
+| Left mouth corner | 3 red 3 mm LEDs | straight line, about 1 cm between adjacent LEDs (about 2 cm between outer centers) | middle collar, left arm |
+| Right mouth corner | 3 red 3 mm LEDs | straight line, about 1 cm between adjacent LEDs (about 2 cm between outer centers) | middle collar, right arm |
+| Internal embers | 3 yellow 5 mm LEDs | alternating vertices of the shared six-LED hexagon; approximately equilateral triangle, about 3 cm sides | shared lower board, facing upward |
+| Demonic flashes | 3 white 5 mm LEDs | the other three vertices of the same hexagon; approximately equilateral triangle, about 3 cm sides | shared lower board, facing upward |
+
+The eye triangles have a nominal height of about **0.87 cm**. On the lower board, arrange the six LEDs around an approximately regular hexagon in the order **yellow–white–yellow–white–yellow–white**. With each same-color triangle about **3 cm per side**, the hexagon sides are about **1.7 cm**. Keep yellow and white as separate electrical groups with separate return wires; each LED retains its own resistor. Check clearance for the lower board, LED bodies, resistors, mast, and telescopic travel before cutting it.
+
+The [LED placement illustration](../img/pumpkin-led-layout.png) shows the intended front view, bendable side arms, and upward orientation of the lower LEDs; it is not dimensioned.
+
+Use the existing 2.54 mm perfboard holes and accept the resulting spacing and shape approximations; no additional holes are needed to match the nominal LED layout. For reference, four grid intervals give 10.16 mm and twelve give 30.48 mm along a row. Check the actual placement before soldering, without forcing the LED leads.
+
+Final aiming and any diffusers depend on the carving and lighting results. Ideally, the LEDs should illuminate the openings without being directly visible. Test the white flash brightness and the yellow ember effect inside the pumpkin before final assembly.
 
 ## 7. Mast wiring and removable connection
 
@@ -156,7 +164,7 @@ Do not attach the arms to the pumpkin flesh: **the mast must fully support them*
 - Planned connection: **six ULN2003A-controlled returns on the 6-pin connector; common +5 V and one spare contact on the 2-pin connector**. The schematic is in the electronics document.
 - LED current-limiting resistors are part of the individual lighting branches/modules.
 - The +5 V contact and its wire must be rated for the total current; protect both connectors from moisture and impacts.
-- Secure the cable to the mast with **strain relief**: never allow a tug to stress solder joints or LED holders.
+- Secure the cable to the mast with **strain relief**: never allow a tug to stress solder joints or LED modules.
 - At the telescopic section, provide a **flexible cable loop** that accommodates the full travel without tension or entering between the sliding surfaces.
 - One practical option is to route cables outside the tubes and organize them with reusable cable ties.
 
@@ -184,9 +192,8 @@ The electronics must remain accessible for servicing and programming without dis
 | Telescopic clamp with knob | 1 | with travel stop |
 | Sliding collars for groups | ~4–6 | diameter selected for the actual tubes |
 | 2–3 mm aluminum wire | ~2 m | for adjustable arms |
-| Rigid plastic tabs | ~6–10 | can be made from salvaged material |
-| Plastic 3 mm LED holders | initially 10–14 | purchase before drilling |
-| Plastic 5 mm LED holders | 2–4 optional | for larger LEDs |
+| Perfboard for LED assemblies | 5 pieces | four red boards and one shared six-LED lower board; size for resistors and mounting margins |
+| Insulating supports / solder-side covers | 5 sets | attach and protect the LED assemblies |
 | M3 screws + self-locking nuts | a few | for adjustable mounting assemblies |
 | Cable ties, sleeving, non-slip rubber | assortment | attachment/protection |
 | JST-XH 6-pin and 2-pin mating pairs | 1 of each type | already available; check matching headers, mounting, and wire gauge |
@@ -197,15 +204,15 @@ Quantities are **estimates for preparing the prototype**, not yet a final purcha
 
 ## 10. Recommended construction sequence
 
-1. **Gather/measure materials**: actual diameters of both tubes, collars, LED holders, and power bank dimensions.
+1. **Gather/measure materials**: actual diameters of both tubes, collars, perfboard, LEDs, and power bank dimensions.
 2. **Bench-test the telescopic mechanism**: sliding, locking, travel stop, and stability at maximum extension.
 3. **Install collars and arms**, checking that they are sufficiently rigid and can be aimed without drifting out of position.
-4. **Prepare the LED-holder tabs**; drill them to match the actual holders; install the LEDs and insulate their leads.
+4. **Prepare the five perfboard assemblies**; mark the selected LED layouts, including the alternating lower hexagon, check spacing and mounting clearance, solder each LED with its own resistor, and insulate the solder side and leads.
 5. **Build the mast wiring**, including the telescopic loop, fasteners, and both connectors.
 6. **Prepare the wooden platform**, feet, hole, and socket, keeping the pumpkin's load separate from the electronics enclosure.
 7. **Add liquid protection**, checking it with the structure powered off and no electronics exposed.
 8. **Bench-test the LEDs**, then the entire driver system.
-9. **Once the pumpkin is available**, adjust height, arms, and LED-holder direction; check that nothing touches the flesh.
+9. **Once the pumpkin is available**, adjust height, arms, and LED-module direction; check that nothing touches the flesh.
 10. **Test complete disassembly and reassembly**: two connectors, one mechanical socket, recoverable mast.
 
 ## 11. Confirmed decisions and open questions
@@ -215,8 +222,8 @@ Quantities are **estimates for preparing the prototype**, not yet a final purcha
 - External **wooden support platform with a central hole**.
 - Electronics compartment **below the platform**, isolated from liquids.
 - Two-section **telescopic mast**, with locking and adjustable LED groups.
-- Sliding collars + bendable arms + adjustable tabs.
-- **Plastic LED holders**, mainly for 3 mm LEDs, with some 5 mm holders.
+- Sliding collars + bendable arms + adjustable perfboard modules.
+- **LEDs and individual resistors soldered onto five perfboard assemblies for six independent groups**, using the layouts in section 6.
 - Wiring attached to the mast; **two JST-XH connectors, 6-pin and 2-pin**, near the base.
 - Mechanical mast support **independent** of the connectors.
 - No 3D printing required for the first version.
@@ -226,8 +233,8 @@ Quantities are **estimates for preparing the prototype**, not yet a final purcha
 - Pumpkin size and weight; final platform dimensions.
 - Actual fit of the two tubes, lengths, travel, and clamp type.
 - Exact dimensions of the hole, waterproof sleeve, and mounting socket.
-- Available LED holders and their required drilling diameters.
-- Final LED count per group, direction, and any diffusers.
+- Final perfboard outlines, mounting holes, insulation, and achievable LED placement.
+- LED-module aiming, brightness, and any diffusers; the initial count is three LEDs per group.
 - JST-XH contact ratings, wire gauge, header mounting, and moisture protection.
 - Actual electronics enclosure dimensions and room for a possible future speaker.
 

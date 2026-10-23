@@ -43,7 +43,7 @@ Pin J1A-1 carries the **sum** of the LED currents; select a wire and contact rat
 
 ### Channels and LEDs
 
-The six groups follow the preliminary distribution in the mechanical design: 2–3 LEDs for each eye and each half of the mouth, about 2 for the embers and 2 for the flashes, giving **12–16 LEDs initially**. Each LED has its own resistor, even when several LEDs in the same group are connected in parallel. The five PWM channels support variable brightness; the sixth on D11 provides on/off flashes. If fading is later required on the sixth channel too, software PWM will be considered in the firmware. At startup, configure all six control pins as LOW outputs before starting the effects.
+The six groups follow the layouts in the mechanical design: three red 3 mm LEDs for each eye and each mouth corner, three yellow 5 mm LEDs for the embers, and three white 5 mm LEDs for the flashes, giving **18 LEDs initially**. The yellow and white LEDs alternate around one lower hexagonal perfboard but remain two separate electrical groups. Each LED has its own resistor, even when several LEDs in the same group are connected in parallel. The five PWM channels support variable brightness; the sixth on D11 provides on/off flashes. The white group on D11 supports steady off/on and flashes only; breathing and dimming are excluded by the [firmware functional specification](firmware-functional-specs.md), so no software PWM is required. At startup, configure all six control pins as LOW outputs before starting the effects.
 
 ## Components and limits
 
@@ -51,7 +51,7 @@ The six groups follow the preliminary distribution in the mechanical design: 2�
 |---|---:|---|
 | Arduino Nano Every 5 V / ATmega4809 | 1 | already available; 5 PWM outputs on D3, D5, D6, D9, D10 |
 | ULN2003A | 1 | THT DIP-16 version, 6 of 7 channels used |
-| Single-color 3/5 mm LEDs | 12–16 initially | electrical design maximum: 6 per channel, 36 total; verify rated current and polarity |
+| Single-color 3/5 mm LEDs | 18 initially | electrical design maximum: 6 per channel, 36 total; verify rated current and polarity |
 | LED resistors | one per LED | starting point: 220 Ω, 0.25 W, to be checked with the actual LEDs |
 | JST-XH J1A and J1B | 2 pairs | one 2-pin and one 6-pin pair, already available; check matching headers, crimped contacts, wire gauge, and rigid mounting |
 | Fuse and fuse holder | 1 | 2 A on +5 V immediately after the power bank; size input wires for at least 2 A |
@@ -60,7 +60,9 @@ The six groups follow the preliminary distribution in the mechanical design: 2�
 | Perfboard, flexible wire, heat-shrink tubing | as needed | insulated solder joints and strain relief |
 | USB power bank, 5 V | 1 | already available; recommended output at least 2 A, to be checked on the label |
 
-**LED resistors.** The ULN2003A has a voltage drop when conducting, so the LEDs will be dimmer than with a nearly ideal MOSFET. For a conservative maximum-current check, this drop can be ignored: with `Vmax=5.25 V`, a red/orange LED with `Vf_min=1.8 V`, and R=220 Ω, the result is `(5.25−1.8)/220 ≈ 15.7 mA` per LED. At 5 V, with `Vf=2.0 V` and an indicative 0.9 V drop across the ULN2003A, the current would be about `9.5 mA`. These are examples: test brightness and current with the purchased LEDs before choosing the final resistor value. A 0.25 W resistor is adequate under the stated conservative assumption (about 0.054 W dissipated).
+**LED resistors.** The ULN2003A has a voltage drop when conducting, so the LEDs will be dimmer than with a nearly ideal MOSFET. For a conservative maximum-current check, this drop can be ignored: with `Vmax=5.25 V`, a red LED with `Vf_min=1.8 V`, and R=220 Ω, the result is `(5.25−1.8)/220 ≈ 15.7 mA` per LED. At 5 V, with `Vf=2.0 V` and an indicative 0.9 V drop across the ULN2003A, the current would be about `9.5 mA`. These are examples: test brightness and current with the purchased LEDs before choosing the final resistor value. A 0.25 W resistor is adequate under the stated conservative assumption (about 0.054 W dissipated).
+
+**White LEDs.** Verify the actual forward voltage and brightness at 5 V with the ULN2003A voltage drop included. Use `I = (V_supply − V_f − V_ULN) / R` to choose and check the resistor for each LED type; do not assume the red-LED current example applies to white LEDs. Test one white LED with 220 Ω before assembling the full flash module.
 
 **Total current.** The limit of 6 LEDs per channel × 6 channels × 15.7 mA gives a conservative ceiling of about **0.57 A** for the lights, plus the Nano Every's consumption. The actual value will probably be lower because of the ULN2003A voltage drop, but must be measured with all lights on. Also check the voltage at the Nano and J1A under load, and the ULN2003A temperature after 30 minutes running the most demanding cycle. The ULN2003A datasheet's 500 mA per-channel rating does not mean seven times that current can be drawn without checking chip power dissipation.
 
