@@ -1,8 +1,8 @@
 # Firmware implementation action plan
 
-**Overall status:** ready to start; production implementation has not begun.  
-**Current task:** T01; parallel lanes open after the T02 contract checkpoint.  
-**Latest update:** execution reorganized into isolated Git worktree lanes with a shared contract checkpoint and sequential integration. No worktrees, commits, or firmware changes were created for this planning update.
+**Overall status:** implementation started; baseline verified, shared contract in progress.  
+**Current tasks:** T03–T05 core lane and T06–T07 hardware lane, opening after the T02 checkpoint.  
+**Latest update:** T01 baseline passed; T02 common channel contract and validation assertions passed. Preparing isolated core and hardware worktrees.
 
 ## Sources and scope
 
@@ -27,8 +27,8 @@ Current baseline: `src/main.cpp` is the two-channel diagnostic sketch. Productio
 
 | ID | Task | Depends on | Status | Completion evidence |
 |---|---|---|---|---|
-| T01 | Confirm implementation baseline and tools | — | TODO | source/config and index checked; compiler and board build availability recorded |
-| T02 | Implement channel model and validated effect assignment | T01 | TODO | host assertions cover mapping, brightness conversion, D11 restrictions, and invalid assignments |
+| T01 | Confirm implementation baseline and tools | — | DONE | clean starting tree at 5ff04d6; g++ available; baseline Nano Every build passed (3707 B flash, 177 B RAM); index source unchanged, metadata one commit behind |
+| T02 | Implement channel model and validated effect assignment | T01 | DONE | g++ C++11 with -Wall -Wextra -Werror -pedantic; channel, brightness, invalid assignment assertions passed |
 | T03 | Implement steady, linear breathing, and flash evaluation | T02 | TODO | exact boundaries, concurrency, independent updates, and rollover assertions pass |
 | T04 | Implement Sleep, Awake, and Chaos scenes | T03 | TODO | all six outputs, paired timing, initial delays, and effect restarts checked |
 | T05 | Implement autonomous scheduler and bounded random selections | T04 | TODO | duration limits, 90/10 selection partition, transitions, and rollover checked |
@@ -156,7 +156,7 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 
 | Check | Latest result | Evidence / next action |
 |---|---|---|
-| Existing diagnostic baseline build | NOT RUN for this plan | run in T01; previous conversation builds are not verification of production code |
+| Existing diagnostic baseline build | PASS | `pio run -e nano_every`: Atmel megaAVR 1.10.0, Arduino core 1.8.8, AVR GCC 7.3.0; flash 3707 B, RAM 177 B |
 | Production host assertions | NOT IMPLEMENTED | add incrementally in T02–T05 and adapter checks in T06–T07 |
 | Production Nano Every build | NOT RUN | first integration build in T06; final build in T08 |
 | Functional acceptance coverage | PENDING | reconcile software and hardware scenarios in T08 |
@@ -167,6 +167,8 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 
 | Event | Result | Next action |
 |---|---|---|
+| T02 contract validated | shared lighting.h declarations, setEffect validation, and native assertions passed; GitNexus index refreshed with runner 1.6.12 | commit checkpoint and open worktrees |
+| Implementation started | clean tree at 5ff04d6; native compiler and baseline build verified | prepare T02 shared contract |
 | Plan created | specifications and confirmed decisions decomposed into T01–T09; no production work started | begin T01 when implementation is requested |
 | Worktree parallelism planned | shared T02 contract; parallel core and hardware lanes; single coordinator; ordered integration gates and worktree register added | complete T01/T02 before creating worktrees |
 
