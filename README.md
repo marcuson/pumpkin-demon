@@ -6,14 +6,14 @@ Autonomous lighting firmware for an Arduino Nano Every inside a real carved pump
 
 | Nano Every | ULN2003A channel | LED group |
 |---|---|---|
-| D3 | 1 | Left eye, red |
-| D5 | 2 | Right eye, red |
-| D6 | 3 | Left mouth corner, red |
-| D9 | 4 | Right mouth corner, red |
-| D10 | 5 | Embers, yellow |
-| D11 | 6 | Flashes, white |
+| D3 | 6 | Left eye, red |
+| D5 | 5 | Right eye, red |
+| D6 | 4 | Left mouth corner, red |
+| D9 | 3 | Right mouth corner, red |
+| D10 | 2 | Embers, yellow |
+| D11 | 1 | Flashes, white |
 
-The first five channels use hardware PWM for intermediate brightness. D11 is digital only: off, fully on, or flashes. Every LED needs its own resistor. A0 is reserved as an unconnected input for startup random-seed sampling.
+The eye, mouth, and ember groups use hardware PWM for intermediate brightness. D11 is digital only: off, fully on, or flashes. Every LED needs its own resistor. A0 is reserved as an unconnected input for startup random-seed sampling.
 
 Follow the [electronics specification](docs/specs/electronical-specs.md) for the complete power distribution, connector mapping, component limits, and assembly checks. Power the Nano through Micro-USB; branch the LED supply before the board and share ground with the ULN2003A. Leave ULN2003A COM unconnected for these LED loads. Follow the [mechanical specification](docs/specs/mechanical-specs.md) for support, insulation, and protection against pumpkin liquids.
 

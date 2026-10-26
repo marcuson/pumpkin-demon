@@ -2,6 +2,10 @@
 
 Status: assembly schematic for the first version, **lights only**, to be verified on the prototype. The [mechanical design](mechanical-specs.md) defines the support for the pumpkin and mast: the electrical connectors do not carry the mast's weight. The compartment below the platform houses the Nano Every, ULN2003A, power bank, power distribution, and two accessible connectors. Protect the electronics and connectors from pumpkin liquids.
 
+## KiCad wiring schematic
+
+Open the [KiCad project](../electronics/pumpkin-demon.kicad_pro) or the [schematic](../electronics/pumpkin-demon.kicad_sch). Symbols are embedded and a local library is included; no external symbol-library setup is required. See the [opening instructions and validation notes](../electronics/README.md). The drawing uses J1 for the J1A supply pair and J3 for the J1B return pair, with the original names shown in their values.
+
 ## Architecture and power supply
 
 ```text
@@ -11,9 +15,9 @@ USB power bank, 5 V (output rated 2 A or more)
      GND ───────────────────── GND bus ───┬─ Micro-USB cable GND
                                           └─ ULN2003A GND
 
-Nano Every D3, D5, D6, D9, D10 (PWM) → ULN2003A inputs 1–5
-Nano Every D11 (digital, ON/OFF flashes) → ULN2003A input 6
-ULN2003A outputs 1–6 → J1B (6-pin), pins 1–6 → cathodes of the six LED groups
+Nano Every D3, D5, D6, D9, D10 (PWM) → ULN2003A inputs 6, 5, 4, 3, 2 respectively
+Nano Every D11 (digital, ON/OFF flashes) → ULN2003A input 1
+ULN2003A outputs 6, 5, 4, 3, 2, 1 → J1B (6-pin), pins 1–6 respectively → cathodes of the six LED groups
 J1A pin 2: spare, insulated and unconnected at both ends
 
 Each LED: J1A pin 1 (+5 V) → its own R_LED → LED anode → LED cathode
@@ -32,14 +36,27 @@ The removable module connects through **two JST-XH connectors already available*
 |---|---|---|
 | J1A-1 | Protected +5 V | common positive supply for all LEDs |
 | J1A-2 | spare, unconnected | spare, unconnected |
-| J1B-1 | ULN2003A output 1, driven by D3 PWM | left eye cathodes |
-| J1B-2 | ULN2003A output 2, driven by D5 PWM | right eye cathodes |
-| J1B-3 | ULN2003A output 3, driven by D6 PWM | left mouth cathodes |
-| J1B-4 | ULN2003A output 4, driven by D9 PWM | right mouth cathodes |
-| J1B-5 | ULN2003A output 5, driven by D10 PWM | internal ember cathodes |
-| J1B-6 | ULN2003A output 6, driven by digital D11 | demonic flash cathodes |
+| J1B-1 | ULN2003A output 6 (DIP pin 11), driven by D3 PWM | left eye cathodes |
+| J1B-2 | ULN2003A output 5 (DIP pin 12), driven by D5 PWM | right eye cathodes |
+| J1B-3 | ULN2003A output 4 (DIP pin 13), driven by D6 PWM | left mouth cathodes |
+| J1B-4 | ULN2003A output 3 (DIP pin 14), driven by D9 PWM | right mouth cathodes |
+| J1B-5 | ULN2003A output 2 (DIP pin 15), driven by D10 PWM | internal ember cathodes |
+| J1B-6 | ULN2003A output 1 (DIP pin 16), driven by digital D11 | demonic flash cathodes |
 
 Pin J1A-1 carries the **sum** of the LED currents; select a wire and contact rated for the measured current. Do not join the cathodes of the six groups. The two differently sized housings are not interchangeable, but label them `+5 V` and `LED returns` anyway, and use a multimeter to verify the pin numbering as viewed from the wiring side. Disconnect and reconnect both only with the switch off; the XH series uses a friction lock, so hold the connector bodies rather than pulling on the wires.
+
+### Arduino-to-driver routing
+
+The six used ULN2003A channels are assigned in reverse order to simplify routing for the chosen component orientation. Arduino pin-to-group assignments and J1B group order remain unchanged; only driver channel assignments change. The existing firmware therefore remains compatible when both input and output wiring follow this table.
+
+| Arduino pin | ULN2003A input / DIP pin | ULN2003A output / DIP pin | J1B pin / group |
+|---|---|---|---|
+| D3 | IN6 / 6 | OUT6 / 11 | 1 / left eye |
+| D5 | IN5 / 5 | OUT5 / 12 | 2 / right eye |
+| D6 | IN4 / 4 | OUT4 / 13 | 3 / left mouth |
+| D9 | IN3 / 3 | OUT3 / 14 | 4 / right mouth |
+| D10 | IN2 / 2 | OUT2 / 15 | 5 / embers |
+| D11 | IN1 / 1 | OUT1 / 16 | 6 / white flashes |
 
 ### Channels and LEDs
 

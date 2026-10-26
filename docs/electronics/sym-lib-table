@@ -1,0 +1,1 @@
+(sym_lib_table (version 7) (lib (name "Pumpkin") (type "KiCad") (uri "${KIPRJMOD}/pumpkin-demon.kicad_sym") (options "") (descr "Embedded project wiring symbols")))

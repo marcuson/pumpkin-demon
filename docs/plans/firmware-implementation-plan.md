@@ -4,7 +4,7 @@
 
 **Current task:** T09, awaiting physical prototype measurements. No software implementation tasks remain.
 
-**Latest update:** G3 passed all three native executables, the Nano Every target build, and focused integrated code review. Documentation is updated; no flash/upload or physical measurements were performed.
+**Latest update:** G3 passed all three native executables, the Nano Every target build, and focused integrated code review. Documentation is updated. Firmware was uploaded successfully on October 26, 2026; physical measurements remain pending.
 
 ## Sources and scope
 
@@ -171,6 +171,7 @@ Parallel branch-local passes are not a substitute for G3. If a lane is delayed, 
 
 | Event | Result | Next action |
 |---|---|---|
+| Firmware upload — 2026-10-26 | `pio run -e nano_every -t upload --upload-port /dev/ttyACM0` succeeded; 7566 bytes written to Nano Every | observe scenes and perform pending T09 measurements |
 | T04 / scheduler checks passed locally | scenes, random bound/order checks, 90/10 partition, durations, repeated Chaos, overdue entry and rollover pass; final core checks in progress | finish core verification |
 | T03 branch-local checks passed | breathing sample values, regular/delayed flashes, rollover, concurrency, and independent updates pass | T04 scenes and T05 scheduler |
 | Worktree cleanup | both worktrees clean; owned paths matched integrated tree exactly; removed worktrees normally and retained task branches | hardware checklist remains T09 |
@@ -188,7 +189,7 @@ Software delivery is complete when T01–T08 are `DONE` with passing recorded ch
 
 ## Hardware handoff checklist
 
-T09 is awaiting hardware, not complete. The production image is built locally but has not been uploaded.
+T09 is awaiting hardware, not complete. The production image was uploaded successfully on October 26, 2026 to the Arduino Nano Every on `/dev/ttyACM0` (USB serial `7F513C2751514C4B39202020FF041218`). PlatformIO reported SUCCESS after writing 7566 bytes of flash. This confirms upload completion, not LED operation or physical timing.
 
 - Upload deliberately to the six-channel assembly using the README instructions; monitor at 115200 baud.
 - Check reset/startup, all six outputs, pair synchronization, white/yellow separation, and PWM/digital transitions. Observe Sleep for its selected 3–10 minute interval; use the logged duration to know when the next episode is due.
